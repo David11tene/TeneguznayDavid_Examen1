@@ -41,4 +41,5 @@ testlogger {
     showPassed true
     showSkipped true
     showFailed true
+    showStandardStreams true
 }
