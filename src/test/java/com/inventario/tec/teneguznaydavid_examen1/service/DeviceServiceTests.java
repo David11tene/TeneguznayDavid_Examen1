@@ -146,7 +146,7 @@ public class DeviceServiceTests {
     }
 
     @Test
-    @DisplayName("BONUS: Consultar dispositivos con stock bajo (< 5)")
+    @DisplayName("Consultar dispositivos con stock bajo (< 5)")
     void testBonus_LowStock() {
         System.out.println("  [ACCION] Registrando dispositivos con stock 2, 4 y 10...");
         Device a1 = new Device(); a1.setNombre("Bajo1"); a1.setSerial("LOW-1"); a1.setCategoria("C1"); a1.setStock(2);
