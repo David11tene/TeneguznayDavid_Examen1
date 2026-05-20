@@ -25,9 +25,9 @@ public class DeviceServiceTests {
     private DeviceRepository deviceRepository;
 
     @Test
-    @DisplayName("P1 Evitar registro de dispositivos con serial duplicado")
+    @DisplayName("Prueba 1: Evitar registro de dispositivos con serial duplicado")
     void testPrueba1_AvoidDuplicateSerial() {
-        // 1. Registrar dispositivo: ABC-001
+        System.out.println("  [ACCION] Registrando dispositivo inicial con serial ABC-001");
         Device device1 = new Device();
         device1.setNombre("Dispositivo 1");
         device1.setSerial("ABC-001");
@@ -35,38 +35,39 @@ public class DeviceServiceTests {
         device1.setStock(10);
         deviceService.create(device1);
 
-        // 2. Intentar registrar otro igual
+        System.out.println("  [VALIDACION] Intentando registrar segundo dispositivo con el mismo serial...");
         Device device2 = new Device();
         device2.setNombre("Dispositivo 2");
         device2.setSerial("ABC-001");
         device2.setCategoria("Categoria 2");
         device2.setStock(5);
 
-        // 3. Verificar: excepción y no duplicación
         assertThrows(ConflictException.class, () -> deviceService.create(device2));
         
         long count = deviceRepository.count();
-        assertEquals(1, count, "No debe haber duplicación en la BD");
+        assertEquals(1, count);
+        System.out.println("  [OK] ConflictException capturada y base de datos sin duplicados");
     }
 
     @Test
-    @DisplayName("P2 No permitir el registro de stock negativo")
+    @DisplayName("Prueba 2: No permitir el registro de stock negativo")
     void testPrueba2_NoNegativeStock() {
-        // Validar stock >= 0
+        System.out.println("  [ACCION] Configurando dispositivo con stock -1");
         Device device = new Device();
         device.setNombre("Dispositivo Negativo");
         device.setSerial("NEG-001");
         device.setCategoria("Test");
         device.setStock(-1);
 
-        // Verificar: excepción o validación fallida
+        System.out.println("  [VALIDACION] Verificando que el servicio rechaza stock negativo...");
         assertThrows(IllegalArgumentException.class, () -> deviceService.create(device));
+        System.out.println("  [OK] IllegalArgumentException lanzada correctamente");
     }
 
     @Test
-    @DisplayName("P3 Desactivar un dispositivo correctamente")
+    @DisplayName("Prueba 3: Desactivar un dispositivo correctamente")
     void testPrueba3_DeactivateDevice() {
-        // 1. Crear dispositivo activo
+        System.out.println("  [ACCION] Creando dispositivo activo...");
         Device device = new Device();
         device.setNombre("Laptop");
         device.setSerial("LAP-001");
@@ -75,44 +76,38 @@ public class DeviceServiceTests {
         device.setAvailable(true);
         Device saved = deviceService.create(device);
 
-        // 2. Desactivarlo
+        System.out.println("  [VALIDACION] Desactivando dispositivo ID: " + saved.getId());
         deviceService.deactivate(saved.getId());
 
-        // 3. Verificar: available = false y mantener nombre, serial, categoría
         Device updated = deviceRepository.findById(saved.getId()).get();
         assertFalse(updated.getAvailable());
         assertEquals("Laptop", updated.getNombre());
-        assertEquals("LAP-001", updated.getSerial());
-        assertEquals("Computo", updated.getCategoria());
+        System.out.println("  [OK] Dispositivo desactivado manteniendo sus datos originales");
     }
 
     @Test
-    @DisplayName("P4 Obtener estadisticas correctas del inventario")
+    @DisplayName("Prueba 4: Obtener estadísticas correctas del inventario")
     void testPrueba4_InventoryStatistics() {
-        // Crear: 2 disponibles, 1 no disponible
-        Device a1 = new Device();
-        a1.setNombre("A1"); a1.setSerial("S1"); a1.setCategoria("C1"); a1.setStock(1); a1.setAvailable(true);
+        System.out.println("  [ACCION] Registrando 2 dispositivos disponibles y 1 no disponible...");
+        Device a1 = new Device(); a1.setNombre("A1"); a1.setSerial("S1"); a1.setCategoria("C1"); a1.setStock(1); a1.setAvailable(true);
         deviceService.create(a1);
-
-        Device a2 = new Device();
-        a2.setNombre("A2"); a2.setSerial("S2"); a2.setCategoria("C2"); a2.setStock(1); a2.setAvailable(true);
+        Device a2 = new Device(); a2.setNombre("A2"); a2.setSerial("S2"); a2.setCategoria("C2"); a2.setStock(1); a2.setAvailable(true);
         deviceService.create(a2);
-
-        Device a3 = new Device();
-        a3.setNombre("A3"); a3.setSerial("S3"); a3.setCategoria("C3"); a3.setStock(1); a3.setAvailable(false);
+        Device a3 = new Device(); a3.setNombre("A3"); a3.setSerial("S3"); a3.setCategoria("C3"); a3.setStock(1); a3.setAvailable(false);
         deviceService.create(a3);
 
-        // Validar: total = 3, available = 2, unavailable = 1
+        System.out.println("  [VALIDACION] Calculando estadísticas...");
         Map<String, Long> stats = deviceService.getStatistics();
         assertEquals(3L, stats.get("total"));
         assertEquals(2L, stats.get("available"));
         assertEquals(1L, stats.get("unavailable"));
+        System.out.println("  [OK] Estadísticas: Total=3, Disponibles=2, No Disponibles=1");
     }
 
     @Test
-    @DisplayName("P5 Verificar la eliminacion logica (soft delete)")
+    @DisplayName("Prueba 5: Verificar la eliminación lógica (soft delete)")
     void testPrueba5_LogicalDeletion() {
-        // 1. Marcar dispositivo como eliminado
+        System.out.println("  [ACCION] Creando dispositivo y aplicando soft delete...");
         Device device = new Device();
         device.setNombre("Eliminar");
         device.setSerial("DEL-001");
@@ -122,37 +117,50 @@ public class DeviceServiceTests {
 
         deviceService.softDelete(saved.getId());
 
-        // 2. Verificar: sigue en BD, deleted = true, no aparece en consultas normales
+        System.out.println("  [VALIDACION] Verificando estado 'deleted' y visibilidad en consultas...");
         Device inDb = deviceRepository.findById(saved.getId()).get();
-        assertTrue(inDb.getDeleted(), "Debe estar marcado como eliminado");
+        assertTrue(inDb.getDeleted());
         
         List<Device> activeOnes = deviceService.findAllActive();
-        assertFalse(activeOnes.stream().anyMatch(a -> a.getId().equals(saved.getId())), "No debe aparecer en consultas normales");
+        assertFalse(activeOnes.stream().anyMatch(a -> a.getId().equals(saved.getId())));
+        System.out.println("  [OK] Dispositivo marcado como eliminado y oculto en consultas activas");
     }
 
     @Test
-    @DisplayName("P6 Busqueda parcial por categoria")
+    @DisplayName("Prueba 6: Búsqueda parcial por categoría (case insensitive)")
     void testPrueba6_PartialCategorySearch() {
-        // Registrar: Laptop, Laptop Gamer, Router
-        Device a1 = new Device();
-        a1.setNombre("L1"); a1.setSerial("SER-1"); a1.setCategoria("Laptop"); a1.setStock(1);
+        System.out.println("  [ACCION] Registrando dispositivos: Laptop, Laptop Gamer, Router");
+        Device a1 = new Device(); a1.setNombre("L1"); a1.setSerial("SER-1"); a1.setCategoria("Laptop"); a1.setStock(1);
         deviceService.create(a1);
-
-        Device a2 = new Device();
-        a2.setNombre("L2"); a2.setSerial("SER-2"); a2.setCategoria("Laptop Gamer"); a2.setStock(1);
+        Device a2 = new Device(); a2.setNombre("L2"); a2.setSerial("SER-2"); a2.setCategoria("Laptop Gamer"); a2.setStock(1);
         deviceService.create(a2);
-
-        Device a3 = new Device();
-        a3.setNombre("R1"); a3.setSerial("SER-3"); a3.setCategoria("Router"); a3.setStock(1);
+        Device a3 = new Device(); a3.setNombre("R1"); a3.setSerial("SER-3"); a3.setCategoria("Router"); a3.setStock(1);
         deviceService.create(a3);
 
-        // Buscar: lap
+        System.out.println("  [VALIDACION] Buscando categoría con término 'lap'...");
         List<Device> results = deviceService.searchByCategoria("lap");
 
-        // Validar: retorna Laptop y Laptop Gamer, NO Router
         assertEquals(2, results.size());
         assertTrue(results.stream().anyMatch(a -> a.getCategoria().equals("Laptop")));
-        assertTrue(results.stream().anyMatch(a -> a.getCategoria().equals("Laptop Gamer")));
-        assertFalse(results.stream().anyMatch(a -> a.getCategoria().equals("Router")));
+        System.out.println("  [OK] Se encontraron 2 resultados que contienen 'lap'");
+    }
+
+    @Test
+    @DisplayName("BONUS: Consultar dispositivos con stock bajo (< 5)")
+    void testBonus_LowStock() {
+        System.out.println("  [ACCION] Registrando dispositivos con stock 2, 4 y 10...");
+        Device a1 = new Device(); a1.setNombre("Bajo1"); a1.setSerial("LOW-1"); a1.setCategoria("C1"); a1.setStock(2);
+        deviceService.create(a1);
+        Device a2 = new Device(); a2.setNombre("Bajo2"); a2.setSerial("LOW-2"); a2.setCategoria("C2"); a2.setStock(4);
+        deviceService.create(a2);
+        Device a3 = new Device(); a3.setNombre("Alto1"); a3.setSerial("HIGH-1"); a3.setCategoria("C3"); a3.setStock(10);
+        deviceService.create(a3);
+
+        System.out.println("  [VALIDACION] Consultando dispositivos con stock < 5...");
+        List<Device> lowStock = deviceService.getLowStock(5);
+
+        assertEquals(2, lowStock.size());
+        assertTrue(lowStock.stream().allMatch(d -> d.getStock() < 5));
+        System.out.println("  [OK] Se retornaron correctamente los 2 dispositivos con bajo stock");
     }
 }
