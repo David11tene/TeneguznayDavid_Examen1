@@ -25,7 +25,7 @@ public class DeviceServiceTests {
     private DeviceRepository deviceRepository;
 
     @Test
-    @DisplayName("Prueba 1: Evitar registro de dispositivos con serial duplicado")
+    @DisplayName("P1 Evitar registro de dispositivos con serial duplicado")
     void testPrueba1_AvoidDuplicateSerial() {
         // 1. Registrar dispositivo: ABC-001
         Device device1 = new Device();
@@ -50,7 +50,7 @@ public class DeviceServiceTests {
     }
 
     @Test
-    @DisplayName("Prueba 2: No permitir el registro de stock negativo")
+    @DisplayName("P2 No permitir el registro de stock negativo")
     void testPrueba2_NoNegativeStock() {
         // Validar stock >= 0
         Device device = new Device();
@@ -64,7 +64,7 @@ public class DeviceServiceTests {
     }
 
     @Test
-    @DisplayName("Prueba 3: Desactivar un dispositivo correctamente")
+    @DisplayName("P3 Desactivar un dispositivo correctamente")
     void testPrueba3_DeactivateDevice() {
         // 1. Crear dispositivo activo
         Device device = new Device();
@@ -87,7 +87,7 @@ public class DeviceServiceTests {
     }
 
     @Test
-    @DisplayName("Prueba 4: Obtener estadísticas correctas del inventario")
+    @DisplayName("P4 Obtener estadisticas correctas del inventario")
     void testPrueba4_InventoryStatistics() {
         // Crear: 2 disponibles, 1 no disponible
         Device a1 = new Device();
@@ -110,7 +110,7 @@ public class DeviceServiceTests {
     }
 
     @Test
-    @DisplayName("Prueba 5: Verificar la eliminación lógica (soft delete)")
+    @DisplayName("P5 Verificar la eliminacion logica (soft delete)")
     void testPrueba5_LogicalDeletion() {
         // 1. Marcar dispositivo como eliminado
         Device device = new Device();
@@ -131,7 +131,7 @@ public class DeviceServiceTests {
     }
 
     @Test
-    @DisplayName("Prueba 6: Búsqueda parcial por categoría (case insensitive)")
+    @DisplayName("P6 Busqueda parcial por categoria")
     void testPrueba6_PartialCategorySearch() {
         // Registrar: Laptop, Laptop Gamer, Router
         Device a1 = new Device();
