@@ -3,6 +3,7 @@ package com.inventario.tec.teneguznaydavid_examen1.service;
 import com.inventario.tec.teneguznaydavid_examen1.domain.Device;
 import com.inventario.tec.teneguznaydavid_examen1.repository.DeviceRepository;
 import com.inventario.tec.teneguznaydavid_examen1.web.advice.ConflictException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ public class DeviceServiceTests {
     private DeviceRepository deviceRepository;
 
     @Test
+    @DisplayName("Prueba 1: Evitar registro de dispositivos con serial duplicado")
     void testPrueba1_AvoidDuplicateSerial() {
         // 1. Registrar dispositivo: ABC-001
         Device device1 = new Device();
@@ -48,6 +50,7 @@ public class DeviceServiceTests {
     }
 
     @Test
+    @DisplayName("Prueba 2: No permitir el registro de stock negativo")
     void testPrueba2_NoNegativeStock() {
         // Validar stock >= 0
         Device device = new Device();
@@ -61,6 +64,7 @@ public class DeviceServiceTests {
     }
 
     @Test
+    @DisplayName("Prueba 3: Desactivar un dispositivo correctamente")
     void testPrueba3_DeactivateDevice() {
         // 1. Crear dispositivo activo
         Device device = new Device();
@@ -83,6 +87,7 @@ public class DeviceServiceTests {
     }
 
     @Test
+    @DisplayName("Prueba 4: Obtener estadísticas correctas del inventario")
     void testPrueba4_InventoryStatistics() {
         // Crear: 2 disponibles, 1 no disponible
         Device a1 = new Device();
@@ -105,6 +110,7 @@ public class DeviceServiceTests {
     }
 
     @Test
+    @DisplayName("Prueba 5: Verificar la eliminación lógica (soft delete)")
     void testPrueba5_LogicalDeletion() {
         // 1. Marcar dispositivo como eliminado
         Device device = new Device();
@@ -125,6 +131,7 @@ public class DeviceServiceTests {
     }
 
     @Test
+    @DisplayName("Prueba 6: Búsqueda parcial por categoría (case insensitive)")
     void testPrueba6_PartialCategorySearch() {
         // Registrar: Laptop, Laptop Gamer, Router
         Device a1 = new Device();
