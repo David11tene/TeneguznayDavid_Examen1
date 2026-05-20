@@ -78,6 +78,13 @@ public class DeviceController {
         return ResponseEntity.ok(service.getStatistics());
     }
 
+    @GetMapping("/low-stock")
+    public ResponseEntity<List<DeviceResponse>> getLowStock() {
+        return ResponseEntity.ok(service.getLowStock(5).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList()));
+    }
+
     private DeviceResponse mapToResponse(Device device) {
         DeviceResponse response = new DeviceResponse();
         response.setId(device.getId());

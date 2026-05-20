@@ -12,4 +12,5 @@ public interface DeviceService {
     List<Device> searchByCategoria(String categoria);
     List<Device> findAllActive();
     Map<String, Long> getStatistics();
+    List<Device> getLowStock(Integer limit);
 }

@@ -18,4 +18,6 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     long countByDeletedFalse();
     
     boolean existsBySerial(String serial);
+
+    List<Device> findByStockLessThanAndDeletedFalse(Integer stock);
 }

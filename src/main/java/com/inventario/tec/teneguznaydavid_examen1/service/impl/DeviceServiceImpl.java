@@ -83,4 +83,9 @@ public class DeviceServiceImpl implements DeviceService {
         stats.put("unavailable", deviceRepository.countByAvailableFalseAndDeletedFalse());
         return stats;
     }
+
+    @Override
+    public List<Device> getLowStock(Integer limit) {
+        return deviceRepository.findByStockLessThanAndDeletedFalse(limit);
+    }
 }
